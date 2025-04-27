@@ -1,0 +1,36 @@
+name: aquahaven
+
+description: >-
+  AquaHaven is a beautiful static aquarium Flutter app showcasing a list of aquarium fish with details. Great for portfolio and learning Flutter best practices.
+
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Add other dependencies here as needed
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_launcher_icons: ^0.13.1
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/clownfish.png
+    - assets/images/neon_tetra.png
+    - assets/images/betta.png
+    - assets/images/logo.png
+    - assets/images/header_title.png
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/logo.png"
