@@ -2,20 +2,297 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:aquahaven/models/fish.dart';
 import 'package:aquahaven/screens/fish_detail_screen.dart';
-import 'package:aquahaven/theme/app_theme.dart';
 
-class HomeScreen extends StatelessWidget {
+extension StringExtensions on String {
+  String toTitleCase() {
+    if (isEmpty) return this;
+    return split(' ').map((word) {
+      if (word.isEmpty) return word;
+      return '${word[0].toUpperCase()}${word.substring(1).toLowerCase()}';
+    }).join(' ');
+  }
+  
+  String pascalToTitleCase() {
+    if (isEmpty) return this;
+    return replaceAllMapped(
+      RegExp(r'^([a-z])|[A-Z]'),
+      (Match m) => m[1] == null ? m[0]! : ' ${m[0]!}',
+    ).trim();
+  }
+}
+
+class FishSearchDelegate extends SearchDelegate<Fish?> {
+  final List<Fish> fishes;
+  
+  FishSearchDelegate(this.fishes);
+  
+  @override
+  List<Widget>? buildActions(BuildContext context) {
+    return [
+      if (query.isNotEmpty)
+        IconButton(
+          icon: const Icon(Icons.clear),
+          onPressed: () => query = '',
+        ),
+    ];
+  }
+  
+  @override
+  Widget? buildLeading(BuildContext context) {
+    return IconButton(
+      icon: const Icon(Icons.arrow_back),
+      onPressed: () => close(context, null),
+    );
+  }
+  
+  @override
+  Widget buildResults(BuildContext context) {
+    final results = fishes.where((fish) {
+      final queryLower = query.toLowerCase();
+      return fish.name.toLowerCase().contains(queryLower) ||
+             fish.scientificName.toLowerCase().contains(queryLower) ||
+             fish.description.toLowerCase().contains(queryLower);
+    }).toList();
+    
+    return _buildSearchResults(results);
+  }
+  
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    if (query.isEmpty) {
+      return const Center(
+        child: Text('Start typing to search for fish'),
+      );
+    }
+    
+    final results = fishes.where((fish) {
+      final queryLower = query.toLowerCase();
+      return fish.name.toLowerCase().contains(queryLower) ||
+             fish.scientificName.toLowerCase().contains(queryLower);
+    }).toList();
+    
+    return _buildSearchResults(results);
+  }
+  
+  Widget _buildSearchResults(List<Fish> results) {
+    if (results.isEmpty) {
+      return const Center(
+        child: Text('No fish found matching your search'),
+      );
+    }
+    
+    return ListView.builder(
+      itemCount: results.length,
+      itemBuilder: (context, index) {
+        final fish = results[index];
+        return ListTile(
+          leading: fish.imageUrl != null
+              ? Image.network(
+                  fish.imageUrl!,
+                  width: 50,
+                  height: 50,
+                  fit: BoxFit.cover,
+                )
+              : const Icon(Icons.pets, size: 50),
+          title: Text(fish.name),
+          subtitle: Text(fish.scientificName),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => FishDetailScreen(fish: fish),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+}
+
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
-  static const List<Map<String, dynamic>> categories = [
-    {'icon': Icons.waves, 'label': 'Freshwater', 'color': Colors.blue},
-    {'icon': Icons.water_drop, 'label': 'Marine', 'color': Colors.teal},
-    {'icon': Icons.filter_vintage, 'label': 'Plants', 'color': Colors.green},
-    {'icon': Icons.bolt, 'label': 'Equipment', 'color': Colors.orange},
-  ];
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
 
+class _HomeScreenState extends State<HomeScreen> {
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+  // Search and filter state
+  String? _selectedCategory;
+  final List<Map<String, dynamic>> categories = [
+    {'icon': Icons.waves, 'label': 'Freshwater', 'color': Colors.blue, 'value': 'freshwater'},
+    {'icon': Icons.water_drop, 'label': 'Marine', 'color': Colors.teal, 'value': 'saltwater'},
+    {'icon': Icons.filter_vintage, 'label': 'Plants', 'color': Colors.green, 'value': 'plant'},
+    {'icon': Icons.bolt, 'label': 'Equipment', 'color': Colors.orange, 'value': 'equipment'},
+  ];
+  
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  List<Fish> get _filteredFish {
+    // Using a sample list for now - in a real app, this would come from an API or database
+    final sampleFish = [
+      Fish(
+        id: '1',
+        name: 'Neon Tetra',
+        scientificName: 'Paracheirodon innesi',
+        description: 'A small, colorful freshwater fish popular in community aquariums.',
+        size: '1.5 inches',
+        temperature: '70-81°F',
+        phRange: '6.0-7.0',
+        price: 2.99,
+        temperament: 'Peaceful',
+        categories: [FishCategory.freshwater, FishCategory.community],
+      ),
+      Fish(
+        id: '2',
+        name: 'Betta Fish',
+        scientificName: 'Betta splendens',
+        description: 'A colorful and popular freshwater fish known for its flowing fins and vibrant colors.',
+        size: '2.5 inches',
+        temperature: '76-82°F',
+        phRange: '6.5-7.5',
+        price: 4.99,
+        temperament: 'Aggressive',
+        categories: [FishCategory.freshwater],
+      ),
+      Fish(
+        id: '3',
+        name: 'Clownfish',
+        scientificName: 'Amphiprioninae',
+        description: 'A colorful saltwater fish that lives in symbiosis with sea anemones.',
+        size: '3 inches',
+        temperature: '75-82°F',
+        phRange: '8.0-8.4',
+        price: 29.99,
+        temperament: 'Semi-aggressive',
+        categories: [FishCategory.saltwater],
+      ),
+      Fish(
+        id: '4',
+        name: 'Java Fern',
+        scientificName: 'Microsorum pteropus',
+        description: 'A hardy aquatic plant that is great for beginners.',
+        size: '8-12 inches',
+        temperature: '68-82°F',
+        phRange: '6.0-7.5',
+        price: 5.99,
+        temperament: 'Peaceful',
+        categories: [FishCategory.plant],
+      ),
+    ];
+    
+    // Apply search query filter
+    Iterable<Fish> filtered = sampleFish;
+    
+    if (_searchQuery.isNotEmpty) {
+      final query = _searchQuery.toLowerCase();
+      // Try to parse the query as a number to handle price searches
+      final queryNumber = double.tryParse(query.replaceAll(RegExp(r'[^0-9.]'), ''));
+      
+      filtered = filtered.where((fish) {
+        // Check name, scientific name, and description
+        if (fish.name.toLowerCase().contains(query) ||
+            fish.scientificName.toLowerCase().contains(query) ||
+            fish.description.toLowerCase().contains(query)) {
+          return true;
+        }
+        
+        // Check if the query can be parsed as a number and matches the price
+        if (queryNumber != null) {
+          return fish.price == queryNumber ||
+                 fish.price.toStringAsFixed(2).contains(query);
+        }
+        
+        return false;
+      });
+    }
+    
+    // Apply category filter if selected
+    if (_selectedCategory != null) {
+      filtered = filtered.where((fish) => 
+        fish.categories.any((category) => 
+          category.toString().toLowerCase().contains(_selectedCategory!.toLowerCase())
+        )
+      );
+    }
+    
+    return filtered.toList();
+  }
+  
+  void _clearFilters() {
+    setState(() {
+      _searchQuery = '';
+      _selectedCategory = null;
+      _searchController.clear();
+    });
+  }
+  
+  // Build a chip to show active filters
+  Widget _buildActiveFilterChip(String label, VoidCallback onDeleted) {
+    return Container(
+      margin: const EdgeInsets.only(right: 8.0, bottom: 8.0),
+      child: Chip(
+        label: Text(label),
+        backgroundColor: Colors.blue[100],
+        deleteIcon: const Icon(Icons.close, size: 16),
+        onDeleted: onDeleted,
+      ),
+    );
+  }
+  
+  void _onSearchTap() {
+    showSearch(
+      context: context,
+      delegate: FishSearchDelegate(_filteredFish),
+    );
+  }
+  
   @override
   Widget build(BuildContext context) {
+    // Get filtered fish based on search query
+    final displayedFish = _filteredFish;
+    
+    // Show empty state if no fish match the search
+    if (displayedFish.isEmpty) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('AquaHaven'),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.search),
+              onPressed: _onSearchTap,
+            ),
+          ],
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.search_off, size: 64, color: Colors.grey),
+              const SizedBox(height: 16),
+              Text(
+                'No fish found',
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
+              const SizedBox(height: 8),
+              const Text('Try a different search term'),
+              TextButton(
+                onPressed: _clearFilters,
+                child: const Text('Clear filters'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+    
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -53,9 +330,8 @@ class HomeScreen extends StatelessWidget {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          Colors.black.withOpacity(0.6),
                           Colors.transparent,
-                          Colors.black.withOpacity(0.6),
+                          Colors.black.withOpacity(0.7),
                         ],
                       ),
                     ),
@@ -66,9 +342,7 @@ class HomeScreen extends StatelessWidget {
             actions: [
               IconButton(
                 icon: const Icon(Icons.search, color: Colors.white),
-                onPressed: () {
-                  // TODO: Implement search functionality
-                },
+                onPressed: _onSearchTap,
               ),
             ],
           ),
@@ -104,6 +378,38 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
                 
+                // Active Filters
+                if (_selectedCategory != null)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Active Filters',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.blueGrey,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Wrap(
+                          children: [
+                            _buildActiveFilterChip(
+                              '${_selectedCategory![0].toUpperCase()}${_selectedCategory!.substring(1)}',
+                              () {
+                                setState(() {
+                                  _selectedCategory = null;
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                
                 // Categories Section
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -123,9 +429,9 @@ class HomeScreen extends StatelessWidget {
                   child: ListView.builder(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
                     scrollDirection: Axis.horizontal,
-                    itemCount: HomeScreen.categories.length,
+                    itemCount: categories.length,
                     itemBuilder: (context, index) {
-                      final category = HomeScreen.categories[index];
+                      final category = categories[index];
                       return Container(
                         width: 100,
                         margin: const EdgeInsets.only(right: 12.0),
@@ -134,10 +440,17 @@ class HomeScreen extends StatelessWidget {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12.0),
                           ),
+                          color: _selectedCategory == category['value'] 
+                              ? (category['color'] as Color).withOpacity(0.2)
+                              : null,
                           child: InkWell(
                             borderRadius: BorderRadius.circular(12.0),
                             onTap: () {
-                              // TODO: Navigate to category
+                              setState(() {
+                                _selectedCategory = _selectedCategory == category['value'] 
+                                    ? null 
+                                    : category['value'] as String?;
+                              });
                             },
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -150,9 +463,14 @@ class HomeScreen extends StatelessWidget {
                                 const SizedBox(height: 8.0),
                                 Text(
                                   category['label'] as String,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 12,
-                                    fontWeight: FontWeight.w500,
+                                    fontWeight: _selectedCategory == category['value'] 
+                                        ? FontWeight.bold 
+                                        : FontWeight.w500,
+                                    color: _selectedCategory == category['value']
+                                        ? (category['color'] as Color)
+                                        : Colors.blueGrey,
                                   ),
                                   textAlign: TextAlign.center,
                                 ),
@@ -206,11 +524,11 @@ class HomeScreen extends StatelessWidget {
                         'Goldfish'
                       ];
                       final fishPrices = [
-                        '\$4.99',
-                        '\$9.99',
-                        '\$3.99',
-                        '\$12.99',
-                        '\$2.99'
+                        4.99,
+                        9.99,
+                        3.99,
+                        12.99,
+                        2.99
                       ];
                       
                       final fish = Fish(
@@ -222,7 +540,7 @@ class HomeScreen extends StatelessWidget {
                         temperature: '72-82°F',
                         phRange: '6.5-7.5',
                         temperament: index % 3 == 0 ? 'Peaceful' : 'Semi-aggressive',
-                        price: double.parse(fishPrices[index].replaceAll(RegExp(r'[^0-9.]'), '')),
+                        price: fishPrices[index],
                         origin: 'South America',
                         lifespan: '3-5 years',
                         careLevel: Difficulty.values[index % 3],

@@ -257,38 +257,35 @@ class _FishCardState extends State<FishCard> with SingleTickerProviderStateMixin
                           tag: 'fish-${widget.fish.id}-image',
                           child: ClipRRect(
                             borderRadius: const BorderRadius.vertical(top: Radius.circular(22)),
-                            child: (widget.fish.imageUrl != null && widget.fish.imageUrl!.isNotEmpty)
-                                ? Image.network(
-                                    widget.fish.imageUrl!,
-                                    fit: BoxFit.cover,
-                                    width: double.infinity,
-                                    height: double.infinity,
-                                    loadingBuilder: (context, child, loadingProgress) {
-                                      if (loadingProgress == null) return child;
-                                      return Center(
-                                        child: CircularProgressIndicator(
-                                          value: loadingProgress.expectedTotalBytes != null
-                                              ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
-                                              : null,
-                                        ),
-                                      );
-                                    },
-                                    errorBuilder: (context, error, stackTrace) => Container(
-                                      color: Colors.grey[200],
-                                      child: const Icon(Icons.error, color: Colors.red, size: 40),
-                                    ),
-                                  ).animate(
-                                    onPlay: (controller) => controller.repeat(),
-                                  ).moveY(
-                                    begin: -10,
-                                    end: 10,
-                                    duration: 4000.ms,
-                                    curve: Curves.easeInOut,
-                                  )
-                                : Container(
-                                    color: Colors.grey[300],
-                                    child: const Icon(Icons.image_not_supported, size: 40, color: Colors.grey),
-                                  ),
+                            child: Container(
+                              color: Colors.grey[200],
+                              child: widget.fish.imageUrl != null && widget.fish.imageUrl!.isNotEmpty
+                                  ? Image.network(
+                                      widget.fish.imageUrl!,
+                                      fit: BoxFit.cover,
+                                      width: double.infinity,
+                                      height: double.infinity,
+                                      loadingBuilder: (context, child, loadingProgress) {
+                                        if (loadingProgress == null) return child;
+                                        return Center(
+                                          child: CircularProgressIndicator(
+                                            value: loadingProgress.expectedTotalBytes != null
+                                                ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                                                : null,
+                                          ),
+                                        );
+                                      },
+                                      errorBuilder: (context, error, stackTrace) => _buildPlaceholderIcon(),
+                                    ).animate(
+                                      onPlay: (controller) => controller.repeat(),
+                                    ).moveY(
+                                      begin: -10,
+                                      end: 10,
+                                      duration: 4000.ms,
+                                      curve: Curves.easeInOut,
+                                    )
+                                  : _buildPlaceholderIcon(),
+                            ),
                           ),
                         ),
                       ),
@@ -459,6 +456,32 @@ class _FishCardState extends State<FishCard> with SingleTickerProviderStateMixin
             ),
           ),
         ],
+      ),
+    );
+  }
+  
+  Widget _buildPlaceholderIcon() {
+    return Container(
+      color: Colors.grey[200],
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.image_not_supported,
+              size: 40,
+              color: Colors.grey[400],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'No image available',
+              style: TextStyle(
+                color: Colors.grey[600],
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
