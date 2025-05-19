@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<browserconfig>
+  <msapplication>
+    <tile>
+      <!-- Windows 8/10/11 Tile -->
+      <square70x70logo src="icons/ms-tile-70x70.png"/>
+      <square150x150logo src="icons/ms-tile-150x150.png"/>
+      <square310x310logo src="icons/ms-tile-310x310.png"/>
+      <wide310x150logo src="icons/ms-tile-310x150.png"/>
+      <TileColor>#2196F3</TileColor>
+      <TileImage src="icons/ms-tile-144x144.png"/>
+    </tile>
+    
+    <!-- Pinned Site -->
+    <notification>
+      <polling-uri src="/pinned/notification"/>
+      <polling-uri2 src="/pinned/notification2"/>
+      <polling-uri3 src="/pinned/notification3"/>
+      <polling-uri4 src="/pinned/notification4"/>
+      <polling-uri5 src="/pinned/notification5"/>
+    </notification>
+    
+    <!-- Jump List -->
+    <jumpList>
+      <desktop:task content="AquaHaven Home" iconUri="https://aquahaven.app/icons/icon-48x48.png" action="https://aquahaven.app/"/>
+      <desktop:task content="Browse Fish" iconUri="https://aquahaven.app/icons/icon-48x48.png" action="https://aquahaven.app/fish"/>
+      <desktop:task content="My Aquarium" iconUri="https://aquahaven.app/icons/icon-48x48.png" action="https://aquahaven.app/aquarium"/>
+    </jumpList>
+    
+    <!-- Pinned Site Tasks -->
+    <pinned>
+      <pinned:taskbar>
+        <pinned:taskbarItem action="https://aquahaven.app/fish/add" iconUri="https://aquahaven.app/icons/icon-48x48.png">
+          Add New Fish
+        </pinned:taskbarItem>
+        <pinned:taskbarItem action="https://aquahaven.app/aquarium/create" iconUri="https://aquahaven.app/icons/icon-48x48.png">
+          Create Aquarium
+        </pinned:taskbarItem>
+      </pinned:taskbar>
+    </pinned>
+  </msapplication>
+  
+  <!-- IE11 Configuration -->
+  <msapplication-config>
+    <add name="msapplication-TileColor" content="#2196F3" />
+    <add name="msapplication-square70x70logo" content="icons/ms-tile-70x70.png" />
+    <add name="msapplication-square150x150logo" content="icons/ms-tile-150x150.png" />
+    <add name="msapplication-wide310x150logo" content="icons/ms-tile-310x150.png" />
+    <add name="msapplication-square310x310logo" content="icons/ms-tile-310x310.png" />
+    <add name="msapplication-notification" content="frequency=30;polling-uri=https://aquahaven.app/pinned/notification" />
+  </msapplication-config>
+  
+  <!-- Pinned Site Meta Tags -->
+  <meta name="application-name" content="AquaHaven"/>
+  <meta name="msapplication-tooltip" content="Your Ultimate Aquarium Companion"/>
+  <meta name="msapplication-starturl" content="/?pinned=true"/>
+  <meta name="msapplication-navbutton-color" content="#2196F3"/>
+  <meta name="msapplication-window" content="width=1024;height=768"/>
+  <meta name="msapplication-tap-highlight" content="no"/>
+  
+  <!-- Pinned Site Tasks -->
+  <meta name="msapplication-task" content="name=AquaHaven Home;action-uri=https://aquahaven.app/;icon-uri=https://aquahaven.app/icons/icon-48x48.png"/>
+  <meta name="msapplication-task" content="name=Browse Fish;action-uri=https://aquahaven.app/fish;icon-uri=https://aquahaven.app/icons/icon-48x48.png"/>
+  <meta name="msapplication-task" content="name=My Aquarium;action-uri=https://aquahaven.app/aquarium;icon-uri=https://aquahaven.app/icons/icon-48x48.png"/>
+  
+  <!-- IE10/11 Pinned Site Badge -->
+  <meta name="msapplication-badge" value="frequency=30;polling-uri=https://aquahaven.app/pinned/badge"/>
+  
+  <!-- IE10/11 Pinned Site Notifications -->
+  <meta name="msapplication-notification" content="frequency=30;polling-uri=https://aquahaven.app/pinned/notification"/>
+  
+  <!-- IE10/11 Pinned Site Tiles -->
+  <meta name="msapplication-square70x70logo" content="icons/ms-tile-70x70.png"/>
+  <meta name="msapplication-square150x150logo" content="icons/ms-tile-150x150.png"/>
+  <meta name="msapplication-wide310x150logo" content="icons/ms-tile-310x150.png"/>
+  <meta name="msapplication-square310x310logo" content="icons/ms-tile-310x310.png"/>
+</browserconfig>

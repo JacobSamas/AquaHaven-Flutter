@@ -1,0 +1,73 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://aquahaven.app/sitemap.xml
+
+# Disallow crawling of admin and API endpoints
+Disallow: /admin/
+Disallow: /api/
+
+# Disallow crawling of search result pages
+Disallow: /search/
+
+# Disallow crawling of debug pages
+Disallow: /debug/
+
+# Disallow crawling of user-specific pages
+Disallow: /user/
+Disallow: /profile/
+
+# Crawl-delay for all search engines (requests per second)
+# Default is 1 request per second
+Crawl-delay: 1
+
+# Specific rules for search engines
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+# Block specific pages
+Disallow: /privacy-policy
+Disallow: /terms-of-service
+
+# Allow all media files
+Allow: /*.css$
+Allow: /*.js$
+Allow: /*.png$
+Allow: /*.jpg$
+Allow: /*.jpeg$
+Allow: /*.gif$
+Allow: /*.svg$
+Allow: /*.webp$
+
+# Block specific file types
+Disallow: /*.json$
+Disallow: /*.xml$
+Disallow: /*.txt$
+
+# Block specific query parameters
+Disallow: /*?*view=
+Disallow: /*?*sort=
+Disallow: /*?*filter=
+
+# Block specific paths
+Disallow: /_next/
+Disallow: /_nuxt/
+Disallow: /_astro/
+Disallow: /_svelte/
+Disallow: /node_modules/
+
+# Allow all other pages
+Allow: /*
+
+# Host
+Host: https://aquahaven.app
+
+# Sitemap
+Sitemap: https://aquahaven.app/sitemap.xml
